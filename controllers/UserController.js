@@ -6,12 +6,19 @@ module.exports = {
     try {
       const { name, email } = req.body;
 
-      const user = await User.findOrCreate({
+      const [user, created] = await User.findOrCreate({
         where: { email },
         defaults: { name, email }
       });
 
-      return res.json(user[0]);
+      if (created) {
+        return res.json({ message: "User created." });
+      }
+
+      if (user) {
+        return res.json({ message: "User already exists." });
+      }
+      // return res.json(user[0]);
     } catch (error) {
       return res.status(400).json({ message: error.message });
     }
@@ -68,7 +75,7 @@ module.exports = {
     }
   },
 
-  async destroy(req, res) {
+  async delete(req, res) {
     try {
       const { id } = req.params;
       let user;
